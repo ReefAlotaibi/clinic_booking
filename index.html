@@ -165,7 +165,6 @@
         }
       }
 
-      // توليد قائمة الأوقات
       const select = document.getElementById("time");
       for (let hour = 9; hour <= 22; hour++) {
         for (let min of [0, 30]) {
@@ -200,7 +199,6 @@
         const dateInput = document.getElementById("date");
         const timeInput = document.getElementById("time");
 
-        // إزالة أي حدود سابقة
         dateInput.classList.remove("error-border");
         timeInput.classList.remove("error-border");
 
