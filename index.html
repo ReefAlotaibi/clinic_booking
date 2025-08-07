@@ -1,230 +1,0 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-
-<head>
-  <meta charset="UTF-8" />
-  <title>نموذج حجز موعد - مجمع أطلس الطبي </title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    body {
-      background-color: #f2f2f2;
-      font-family: 'Arial', sans-serif;
-    }
-
-    .form-container {
-      width: 90%;
-      height: auto;
-
-    }
-
-    h2 {
-      text-align: center;
-      margin-bottom: 10px;
-    }
-
-    label {
-      display: block;
-      margin-top: 10px;
-      font-weight: bold;
-    }
-
-    input,
-    select,
-    textarea {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      box-sizing: border-box;
-    }
-
-    textarea {
-      height: 100px;
-      resize: vertical;
-    }
-
-    button {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      cursor: pointer;
-      width: 100%;
-      border-radius: 5px;
-      font-size: 16px;
-    }
-
-    button:hover {
-      background-color: #45a049;
-    }
-
-    .note {
-      margin-top: 20px;
-      color: red;
-      font-weight: bold;
-      text-align: center;
-      font-size: 16px;
-    }
-
-    .logo {
-      display: block;
-      margin: 0 auto 20px auto;
-      max-width: 300px;
-      /* عرض الشعار */
-      height: auto;
-    }
-  </style>
-</head>
-
-<body>
-
-  <div class="container">
-    <header>
-      <div style="text-align:center; margin-bottom: 30px;">
-        <img src="logo.jpg" alt="شعار المستشفى" class="logo">
-        <p>📞 الجوال: 0507292777 </p>
-        <p>✉ البريد: atlsmmc@hotmail.com </p>
-        <p>📍الطائف - حي الحويه - شارع مثملة </p>
-      </div>
-    </header>
-
-
-    <h2> حجز موعد في مجمع أطلس الطبي</h2>
-    <div class="from-container">
-      <form id="bookingForm">
-        <label for="name">الاسم الكامل</label>
-        <input type="text" id="name" name="name" required />
-
-        <label for="phone">رقم الجوال (بدون +966)</label>
-        <div style="display: flex; gap: 5px;">
-          <input type="text" value="+966" readonly style="width: 70px; text-align: center;">
-          <input type="tel" id="phone" placeholder="5XXXXXXXX" pattern="[5][0-9]{8}" maxlength="9" required
-            oninvalid="this.setCustomValidity('يجب إدخال رقم جوال يبدأ بـ5 ويتكون من 9 أرقام')"
-            oninput="this.setCustomValidity('')" style="flex: 1;">
-        </div>
-        <label>القسم:</label>
-        <select id="department" required onchange="updateDoctors()">
-          <option value="">اختر القسم</option>
-          <option value="جلدية">جلدية</option>
-          <option value="تجميل">تجميل</option>
-          <option value="ليزر">ليزر</option>
-          <option value="أسنان">أسنان</option>
-          <option value="حجامة">حجامة</option>
-        </select>
-
-        <label for="doctor">الطبيب:</label>
-        <select id="doctor" name="doctor" required>
-          <option value="">اختر طبيبًا</option>
-        </select>
-
-        <label for="date">تاريخ الموعد:</label>
-        <input type="date" id="date" name="date" required />
-
-        <label for="time">الوقت</label>
-        <select id="time" name="time" required></select>
-
-        <button type="button" onclick="sendWhatsApp()">حجز الموعد</button>
-
-        <p
-          style="margin-top: 15px; color: red; font-size: 15px; font-weight: bold;border: 1px solid red; padding: 10px; border-radius: 10px;">
-          <strong>تنبيه ⚠ :</strong>
-          بعد الضغط على زر “حجز الموعد”، سيتم تحويلك إلى واتساب لإرسال بيانات الحجز إلى العيادة.<br>
-          ✅سيتم تأكيد الموعد بعد مراجعة الطلب والتواصل معك من قبل طاقم الاستقبال.
-        </p>
-
-      </form>
-    </div>
-
-    <footer>
-      &copy; 2025 مجمع أطلس الطبي - جميع الحقوق محفوظة
-    </footer>
-
-    <script>
-
-      const doctorsByDept = {
-        "جلدية": ["د. فيفي عباس"],
-        "تجميل": ["د. فيفي عباس"],
-        "ليزر": ["د. فيفي عباس"],
-        "أسنان": ["( طبيبة أسنان عام ) د. قمر الرفاعي  ", "( طبيبة أسنان عام ) د. أسراء عبدالغني  ", "( طبيب أسنان عام ) د. عبدالله السفياني ", "( استشاري تقويم أسنان ) د.  احمد عمار "],
-        "حجامة": ["د. اشرف محمود "]
-      };
-
-      function updateDoctors() {
-        const dept = document.getElementById("department").value;
-        const doctorSelect = document.getElementById("doctor");
-        doctorSelect.innerHTML = '<option value="">اختر طبيبًا</option>';
-        if (doctorsByDept[dept]) {
-          doctorsByDept[dept].forEach(doc => {
-            const opt = document.createElement("option");
-            opt.value = doc;
-            opt.textContent = doc;
-            doctorSelect.appendChild(opt);
-          });
-        }
-      }
-
-      const select = document.getElementById("time");
-      // تبدأ من 9 صباحًا (9) إلى 22 مساءً (10 مساءً)
-      for (let hour = 9; hour <= 22; hour++) {
-        for (let min of [0, 30]) {
-          if (hour === 22 && min > 0) break; // تنهي عند 22:00 فقط
-
-          // تنسيق الساعة بصيغة 2 رقمية
-          let hourStr = hour.toString().padStart(2, '0');
-          let minStr = min.toString().padStart(2, '0');
-          let timeValue = ` ${hourStr}:${minStr}`;
-
-          // تحويل الساعة 24 إلى 12 مع AM/PM
-          let displayHour = hour > 12 ? hour - 12 : hour;
-          let displayHourStr = displayHour.toString().padStart(2, '0');
-          let ampm = (hour < 12) ? 'صباحًا' : 'مساءً';
-
-          // تنسيق الوقت للعرض (مثلاً 01:30 مساءً)
-          let displayTime = `${displayHourStr}:${minStr} ${ampm}`;
-
-          // إنشاء عنصر option
-          let option = document.createElement('option');
-          option.value = timeValue;
-          option.textContent = displayTime;
-
-          select.appendChild(option);
-        }
-      }
-
-
-      // التحقق من اليوم والوقت
-      document.getElementById("bookingForm").addEventListener("submit", function (e) {
-        e.preventDefault();
-        const dateInput = document.getElementById("date").value;
-        const selectedDate = new Date(dateInput);
-        const day = selectedDate.getDay(); // الجمعة = 5
-        if (day === 5) {
-          alert("❌ المستشفى مغلق يوم الجمعة. يرجى اختيار يوم آخر.");
-          return;
-        }
-        alert("✅ تم حجز الموعد بنجاح.");
-        this.reset();
-      });
-
-      function sendWhatsApp() {
-        const name = document.getElementById("name").value;
-        const phone = document.getElementById("phone").value;
-        const department = document.getElementById("department").value;
-        const doctor = document.getElementById("doctor").value;
-        const date = document.getElementById("date").value;
-        const time = document.getElementById("time").value;
-
-        const message = ` مرحبًا، أود حجز موعد:\nالاسم: ${name}\nرقم الجوال: 0${phone}\nالقسم: ${department}\nالطبيب: ${doctor}\nالتاريخ: ${date}\nالوقت  :${time}`;
-        const encodedMessage = encodeURIComponent(message);
-        const hospitalNumber = "966507292777";
-        const whatsappURL = ` https://wa.me/966507292777?text=${encodedMessage}`;
-
-        window.open(whatsappURL, "_blank");
-      }
-    </script>
-
-</body>
-
-</html>
