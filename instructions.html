@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>دليل الاستخدام والتشغيل</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        :root {
+            --brand: #0066cc;
+            --text: #222;
+            --muted: #666;
+            --border: #e6e6e6;
+            --card: #fff;
+            --bg: #f7f7f7;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: Tahoma, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0
+        }
+
+        header {
+            background: var(--card);
+            border-bottom: 1px solid var(--border)
+        }
+
+        .topbar {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+
+        .brand img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            border-radius: 8px
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 30px;
+            color: var(--brand)
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px
+        }
+
+        .btn {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 8px;
+            background: var(--brand);
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 0 16px;
+            display: grid;
+            gap: 14px
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .04)
+        }
+
+        .card h2 {
+            margin: 0 0 10px;
+            font-size: 18px;
+            color: var(--brand)
+        }
+
+        p,
+        li {
+            line-height: 1.9
+        }
+
+        .muted {
+            color: var(--muted);
+            font-size: 13px
+        }
+
+        /* Accordion */
+        details {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: #fff;
+            padding: 12px 14px
+        }
+
+        details+details {
+            margin-top: 10px
+        }
+
+        summary {
+            cursor: pointer;
+            font-weight: bold;
+            color: #0d5db8
+        }
+
+        summary::-webkit-details-marker {
+            display: none
+        }
+
+        summary:after {
+            content: "▼";
+            float: left;
+            color: #aaa;
+            transition: .2s
+        }
+
+        details[open] summary:after {
+            transform: rotate(180deg)
+        }
+
+        /* tips/warn */
+        .tip {
+            background: #eaf5ff;
+            border: 1px solid #cfe6ff;
+            color: #064a7b;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px
+        }
+
+        .warn {
+            background: #fff7e6;
+            border: 1px solid #ffd195;
+            color: #7a4a00;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px
+        }
+
+        ul.check {
+            list-style: "✅ ";
+            padding-right: 1.2em
+        }
+
+        code {
+            background: #f4f4f4;
+            border: 1px solid #eee;
+            padding: 2px 6px;
+            border-radius: 6px
+        }
+
+        @media print {
+            body {
+                background: #fff;
+                font-size: 12px
+            }
+
+            .actions,
+            .btn {
+                display: none !important
+            }
+
+            .card {
+                page-break-inside: avoid
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="topbar">
+            <div class="brand">
+                <img src="logo.jpg" alt="الشعار">
+                <h1>دليل الاستخدام والتشغيل</h1>
+            </div>
+            <div class="actions">
+                <button class="btn" onclick="window.print()">🖨 طباعة</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="card">
+            <h2>نظرة عامة</h2>
+            <p>
+                يوضّح هذا الدليل كيفية تحديث البيانات في <strong>Google Sheets</strong> وطباعة التقارير.
+                الوصول لجميع الصفحات (نموذج الحجز، لوحة التحكم، التقرير السنوي) يتم حصريًا عبر
+                <strong>البوابة الموحدة المحمية برمز دخول</strong> التي يوفّرها قسم تقنية المعلومات.
+            </p>
+            <p class="muted">لا توجد روابط مباشرة هنا حفاظًا على الخصوصية.</p>
+        </section>
+
+        <section class="card">
+            <h2>تحرير بيانات Google Sheets</h2>
+            <details open>
+                <summary>1) ورقة MonthlyVisits (الزيارات الشهرية)</summary>
+                <ul>
+                    <li>حدّثي أرقام كل شهر في الأعمدة: <strong>جلدية، تجميل، ليزر، أسنان عام، تقويم أسنان،
+                            حجامة</strong>.</li>
+                    <li>لا تغيّري اسم عمود <strong>الشهر</strong> ولا ترتيب الأعمدة.</li>
+                    <li>وجود عمود <strong>إجمالي</strong> اختياري — الكود يتجاهله تلقائيًا.</li>
+                    <li>التغييرات تظهر تلقائيًا في <em>التقرير السنوي</em> بعد تحديث الصفحة.</li>
+                </ul>
+            </details>
+
+            <details>
+                <summary>2) ورقة DepartmentShare (توزيع الأقسام)</summary>
+                <ul>
+                    <li>عمود 1: <strong>القسم</strong> (أو <strong>العيادة</strong>)</li>
+                    <li>عمود 2: <strong>الزيارات</strong> <em>أو</em> <strong>النسبة</strong> (٪)</li>
+                    <li>لو استخدمتي النسبة، اكتبي أرقامًا فقط (مثال: <code>23.5</code>).</li>
+                    <li>تظهر مباشرة في الرسم الدائري وجدول الأقسام في التقرير.</li>
+                </ul>
+            </details>
+
+            <details>
+                <summary>3) ورقة DashboardData (لوحة التحكم)</summary>
+                <p>حدّثي الأرقام اليومية/الأسبوعية حسب التنسيق المُتّفق عليه. صفحة لوحة التحكم تقرأ هذه الورقة مباشرة.
+                </p>
+            </details>
+
+            <div class="warn">
+                ملاحظة: إذا تغيّر <strong>ملف الشيت</strong> أو اسم إحدى الأوراق، أبلغي تقنية المعلومات لتحديث الرابط
+                الداخلي في النظام.
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>التصدير والطباعة</h2>
+            <ul>
+                <li>لطباعة أي صفحة: زر <strong>🖨 طباعة</strong> داخل الصفحة.</li>
+                <li>لتصدير PDF: زر <strong>⬇ PDF</strong> داخل الصفحات (لوحة التحكم والتقرير السنوي).</li>
+            </ul>
+            <div class="tip">يفضّل استخدام Chrome/Edge وتحديد حجم الورق A4.</div>
+        </section>
+
+        <section class="card">
+            <h2>تشغيل وصيانة (قائمة التحقق الأسبوعية)</h2>
+            <ul class="check">
+                <li>تحديث أرقام الأسبوع/الشهر في Google Sheets.</li>
+                <li>فتح لوحة التحكم والتأكد من ظهور الرسومات والجداول.</li>
+                <li>فتح التقرير السنوي والتأكد من تحديث المخططات والجدول.</li>
+                <li>تصدير PDF وحفظه في مجلد التقارير.</li>
+                <li>نسخ احتياطي للشيت: <em>ملف → إنشاء نسخة</em>.</li>
+            </ul>
+        </section>
+
+        <section class="card">
+            <h2>حلول سريعة للأخطاء</h2>
+            <details open>
+                <summary>الرسوم لا تظهر</summary>
+                <ul>
+                    <li>تأكدي أن الشيت متاح “أي شخص لديه الرابط يمكنه العرض”.</li>
+                    <li>تشغيل الصفحات عبر خادم محلي (Live Server) إن أمكن.</li>
+                    <li>مطابقة أسماء الأعمدة: <code>الشهر / القسم(العيادة) / الزيارات أو النسبة</code>.</li>
+                    <li>تحديث قوي: <strong>Ctrl+F5</strong> (أو Cmd+Shift+R).</li>
+                </ul>
+            </details>
+            <details>
+                <summary>الأرقام تظهر كنصوص</summary>
+                <ul>
+                    <li>اكتبي أرقامًا فقط بدون كلمات أو رموز (مثال: <code>120</code> وليس <code>120 زيارة</code>).</li>
+                    <li>بالنسبة للنسب: رقم فقط (الصفحة تضيف علامة ٪ تلقائيًا).</li>
+                </ul>
+            </details>
+            <details>
+                <summary>تغيير التاريخ في رأس التقرير السنوي</summary>
+                <p>داخل <code>stats.html</code> ابحثي عن:</p>
+                <pre><code>const today = new Date('2025-07-24'); // غيّري التاريخ هنا</code></pre>
+            </details>
+        </section>
+
+        <p class="muted" style="text-align:center">© 2025 — دليل التشغيل الخاص بالمجمع الطبي (الوصول عبر البوابة
+            الموحدة)</p>
+    </main>
+</body>
+
+</html>

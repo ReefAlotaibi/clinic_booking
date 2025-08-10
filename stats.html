@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>تقرير الزيارات السنوي - مجمع اطلس الطبي</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --brand: #0066cc;
+            --text: #222;
+            --card: #fff;
+            --muted: #666;
+            --border: #e6e6e6;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: Tahoma, sans-serif;
+            direction: rtl;
+            background: #f7f7f793;
+            color: var(--text);
+            margin: 0
+        }
+
+        header {
+            background: var(--card);
+            border-bottom: 1px solid var(--border)
+        }
+
+        .topbar {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 14px 20px
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+
+        .brand img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            border-radius: 8px
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 30px;
+            color: var(--brand);
+            font-weight: bold
+        }
+
+        .meta {
+            flex: 1;
+            text-align: left
+        }
+
+        #today {
+            margin: 0;
+            color: var(--muted)
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px
+        }
+
+        .btn {
+            padding: 9px 14px;
+            border: none;
+            border-radius: 8px;
+            background: var(--brand);
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px
+        }
+
+        .btn.secondary {
+            background: #12a150
+        }
+
+        .page {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 16px;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(320px, 1fr));
+            gap: 20px
+        }
+
+        @media (max-width:900px) {
+            .page {
+                grid-template-columns: 1fr
+            }
+
+            .meta {
+                display: none
+            }
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, .05);
+            padding: 18px
+        }
+
+        .card h2 {
+            margin: 0 0 10px;
+            font-size: 18px;
+            color: var(--brand)
+        }
+
+        .chart-box {
+            height: 360px
+        }
+
+        @media (max-width:600px) {
+            .chart-box {
+                height: 280px
+            }
+        }
+
+        canvas {
+            width: 100% !important;
+            height: 100% !important
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed
+        }
+
+        th,
+        td {
+            border: 1px solid var(--border);
+            padding: 10px;
+            text-align: center
+        }
+
+        thead th {
+            background: #f3f6fb
+        }
+
+        /* جدول الأقسام */
+        #deptTable th,
+        #deptTable td {
+            text-align: center;
+            padding: 10px;
+        }
+
+        #deptTable thead th {
+            background: #f3f6fb;
+        }
+
+        #deptTable tbody tr:nth-child(even) {
+            background: #fafafa;
+        }
+
+        .notice {
+            background: #fff7e6;
+            border: 1px solid #ffd195;
+            color: #7a4a00;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 10px 0;
+            text-align: center
+        }
+
+        .capturing .no-print {
+            display: none !important
+        }
+
+        @media print {
+            body {
+                width: 210mm;
+                height: 297mm;
+                margin: 10mm;
+                background: #fff;
+                font-size: 12px
+            }
+
+            header {
+                background: #fff !important;
+                color: #000 !important;
+                border-bottom: 1px solid #ccc
+            }
+
+            .brand h1 {
+                color: #000 !important
+            }
+
+            .brand img {
+                width: 60px;
+                height: 60px;
+                object-fit: contain;
+            }
+
+            #today {
+                color: #000 !important
+            }
+
+            .page {
+                display: block
+            }
+
+            .card {
+                page-break-inside: avoid;
+                margin-bottom: 14px;
+                box-shadow: none
+            }
+
+            .no-print,
+            button {
+                display: none !important
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="printArea">
+        <header>
+            <div class="topbar">
+                <div class="brand">
+                    <img src="logo.jpg" alt="شعار المستشفى">
+                    <h1>تقرير الزيارات السنوي</h1>
+                </div>
+                <div class="meta">
+                    <p id="today"></p>
+                </div>
+                <div class="actions no-print">
+                    <button class="btn" onclick="window.print()">🖨 طباعة</button>
+                    <button class="btn secondary" onclick="exportPDF(event)">⬇ PDF</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="page">
+            <!-- 1) زيارات الأشهر -->
+            <section class="card">
+                <h2>📅 زيارات المستشفى حسب الشهر</h2>
+                <div class="chart-box"><canvas id="monthlyChart"></canvas></div>
+                <p id="monthlyTotal" style="text-align:center; margin-top:10px"></p>
+            </section>
+
+            <!-- 2) توزيع الأقسام -->
+            <section class="card">
+                <h2>🏥 توزيع الزيارات على الأقسام</h2>
+                <div class="chart-box"><canvas id="deptChart"></canvas></div>
+                <p id="deptTop" style="text-align:center; margin-top:10px"></p>
+
+                <!-- جدول الأقسام (يمتلئ تلقائيًا من الشيت) -->
+                <table id="deptTable" style="margin-top:12px;">
+                    <thead>
+                        <tr>
+                            <th>القسم</th>
+                            <th>القيمة</th> <!-- زيارات أو نسبة % حسب المتوفر -->
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </section>
+
+            <!-- 3) جدول ملخص -->
+            <section class="card" style="grid-column:1/-1">
+                <h2>📊 ملخص السنة</h2>
+                <table id="summaryTable">
+                    <thead>
+                        <tr>
+                            <th>المؤشر</th>
+                            <th>القيمة</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>إجمالي الزيارات السنوي</td>
+                            <td id="sumYear">—</td>
+                        </tr>
+                        <tr>
+                            <td>أعلى شهر زيارات</td>
+                            <td id="bestMonth">—</td>
+                        </tr>
+                        <tr>
+                            <td>أكثر قسم زيارة</td>
+                            <td id="bestDept">—</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <!-- html2canvas + jsPDF -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+    <script>
+        // دالة لتنسيق الأرقام بفواصل
+        const fmt = n => Number(n).toLocaleString('en');
+
+        // التاريخ
+        (function () {
+            const today = new Date();
+            const opt = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('today').textContent = "📅 التاريخ: " + today.toLocaleDateString('ar-EG', opt);
+        })();
+
+        // روابط CSV المنشورة من Google Sheets 
+        const SHEET_CSV_MONTHLY = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS2-wtcsZJlDXPBL_-WHldwl3HiO2fFCJ5xokezULto8AYpXUIMB8bqPuWsfJSVgpjQHJYDyhm4_RQE/pub?gid=1826260664&single=true&output=csv';
+        const SHEET_CSV_DEPT = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS2-wtcsZJlDXPBL_-WHldwl3HiO2fFCJ5xokezULto8AYpXUIMB8bqPuWsfJSVgpjQHJYDyhm4_RQE/pub?gid=1243049552&single=true&output=csv';
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadMonthlySmart();
+            loadDepartmentsSmart();
+        });
+
+        // Helpers
+        async function fetchCSV(url) {
+            const res = await fetch(url, { cache: 'no-store' });
+            const text = await res.text();
+            const rows = text.trim().split(/\r?\n/).map(r => r.split(','));
+            if (!rows.length) throw new Error('CSV فارغ');
+            rows[0][0] = rows[0][0].replace(/^\uFEFF/, '').trim();
+            return rows;
+        }
+        function sum(arr) { return arr.reduce((a, b) => a + b, 0); }
+
+        // 1) الأشهر: نجمع كل أعمدة الأقسام لكل شهر (نتجاهل "إجمالي" إن وجد)
+        async function loadMonthlySmart() {
+            try {
+                const rows = await fetchCSV(SHEET_CSV_MONTHLY);
+                const headers = rows[0].map(h => h.trim());
+                const idxMonth = headers.findIndex(h => h.includes('الشهر') || h.includes('شهر'));
+                if (idxMonth === -1) throw new Error('عمود "الشهر" غير موجود في MonthlyVisits');
+
+                const deptCols = headers
+                    .map((h, i) => ({ h, i }))
+                    .filter(c => c.i !== idxMonth && !/إجمالي/i.test(c.h))
+                    .map(c => c.i);
+
+                const labels = [], values = [];
+                for (let r = 1; r < rows.length; r++) {
+                    const month = (rows[r][idxMonth] || '').trim();
+                    if (!month) continue;
+                    let s = 0;
+                    for (const c of deptCols) {
+                        const v = parseFloat((rows[r][c] || '0').toString().replace(/[^\d.]/g, '')) || 0;
+                        s += v;
+                    }
+                    labels.push(month);
+                    values.push(s);
+                }
+
+                const ctx = document.getElementById('monthlyChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: { labels, datasets: [{ label: 'زيارات', data: values }] },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false }, title: { display: true, text: 'زيارات المستشفى شهريًا' } },
+                        scales: { y: { beginAtZero: true } }
+                    }
+                });
+
+                const total = sum(values);
+                document.getElementById('monthlyTotal').textContent = 'إجمالي الزيارات السنوي: ' + fmt(total);
+                const maxIdx = values.indexOf(Math.max(...values));
+                const sumYearEl = document.getElementById('sumYear');
+                const bestMonthEl = document.getElementById('bestMonth');
+                if (sumYearEl) sumYearEl.textContent = fmt(total);
+                if (bestMonthEl) bestMonthEl.textContent = labels[maxIdx] + ' (' + fmt(values[maxIdx]) + ')';
+            } catch (e) {
+                console.error(e);
+                document.getElementById('monthlyTotal').textContent = 'تعذّر تحميل بيانات الأشهر. تأكدي من CSV وعناوين الأعمدة.';
+                const box = document.createElement('div');
+                box.className = 'notice';
+                box.textContent = 'تعذّر تحميل بيانات الأشهر. تأكدي من نشر الورقة كـ CSV ومن أسماء الأعمدة.';
+                document.querySelector('.page')?.prepend(box);
+            }
+        }
+
+        // 2) الأقسام: يقبل "الزيارات" أو "النسبة" (٪) ويعبّي جدول deptTable
+        async function loadDepartmentsSmart() {
+            try {
+                const rows = await fetchCSV(SHEET_CSV_DEPT);
+                const headers = rows[0].map(h => h.trim());
+                const idxDept = headers.findIndex(h => /العيادة|القسم/i.test(h));
+                let idxVisits = headers.findIndex(h => /الزيارات/i.test(h));
+                let idxPct = headers.findIndex(h => /النسبة/i.test(h));
+
+                if (idxDept === -1 || (idxVisits === -1 && idxPct === -1))
+                    throw new Error('تأكدي من وجود "القسم/العيادة" و"الزيارات" أو "النسبة" في DepartmentShare');
+
+                const labels = [], values = [];
+                const isPercent = (idxVisits === -1);
+
+                for (let r = 1; r < rows.length; r++) {
+                    const name = (rows[r][idxDept] || '').trim();
+                    if (!name) continue;
+                    let val = 0;
+                    if (!isPercent) {
+                        val = parseFloat((rows[r][idxVisits] || '0').toString().replace(/[^\d.]/g, '')) || 0;
+                    } else {
+                        const raw = (rows[r][idxPct] || '0').toString().replace('%', '').trim();
+                        val = parseFloat(raw) || 0; // نسبة مباشرة
+                    }
+                    labels.push(name);
+                    values.push(val);
+                }
+
+                // الرسم
+                const ctx = document.getElementById('deptChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: { labels, datasets: [{ data: values }] },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom' }, title: { display: true, text: (isPercent ? 'نسبة الزيارات لكل قسم' : 'مجموع الزيارات لكل قسم') } }
+                    }
+                });
+
+                // أفضل قسم
+                const maxIdx = values.indexOf(Math.max(...values));
+                const bestText = labels[maxIdx] + ' (' + (isPercent ? values[maxIdx].toFixed(1) + '%' : fmt(values[maxIdx])) + ')';
+                const bestDeptEl = document.getElementById('bestDept');
+                const deptTopEl = document.getElementById('deptTop');
+                if (bestDeptEl) bestDeptEl.textContent = bestText;
+                if (deptTopEl) deptTopEl.textContent = 'أكثر قسم زيارة: ' + bestText;
+
+                // تعبئة الجدول
+                const tbody = document.querySelector('#deptTable tbody');
+                if (tbody) {
+                    tbody.innerHTML = '';
+                    const items = labels.map((name, i) => ({ name, val: values[i] })).sort((a, b) => b.val - a.val);
+                    for (const item of items) {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `<td>${item.name}</td><td>${isPercent ? item.val.toFixed(1) + '%' : fmt(item.val)}</td>`;
+                        tbody.appendChild(tr);
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+                const tbody = document.querySelector('#deptTable tbody');
+                if (tbody) { tbody.innerHTML = '<tr><td colspan="2">تعذّر تحميل توزيع الأقسام. تأكدي من رابط CSV والأعمدة.</td></tr>'; }
+                const el = document.getElementById('deptTop');
+                if (el) el.textContent = 'تعذّر تحميل توزيع الأقسام.';
+                const box = document.createElement('div');
+                box.className = 'notice';
+                box.textContent = 'تعذّر تحميل توزيع الأقسام. تأكدي من نشر الورقة كـ CSV ومن أسماء الأعمدة.';
+                document.querySelector('.page')?.prepend(box);
+            }
+        }
+
+        // PDF
+        async function exportPDF(ev) {
+            try {
+                const btn = ev?.target; if (btn) { btn.disabled = true; btn.textContent = 'جارٍ إنشاء PDF...'; }
+                document.body.classList.add('capturing');
+                await new Promise(r => setTimeout(r, 300));
+                const node = document.getElementById('printArea');
+                const canvas = await html2canvas(node, { scale: 2, backgroundColor: '#FFFFFF', useCORS: true });
+                const img = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pageW = 210, pageH = 297, m = 5;
+                const imgW = pageW - m * 2;
+                const imgH = (canvas.height * imgW) / canvas.width;
+                let y = m;
+                pdf.addImage(img, 'PNG', m, y, imgW, imgH);
+                let left = imgH - (pageH - y - m);
+                let pos = y - pageH + m;
+                while (left > 0) {
+                    pdf.addPage();
+                    pos += pageH;
+                    pdf.addImage(img, 'PNG', m, -pos, imgW, imgH);
+                    left -= pageH;
+                }
+                pdf.save('stats-yearly.pdf');
+            } catch (e) {
+                alert('تعذّر إنشاء PDF. تأكدي من logo.jpg وروابط CSV.');
+                console.error(e);
+            } finally {
+                document.body.classList.remove('capturing');
+                const btn = ev?.target; if (btn) { btn.disabled = false; btn.textContent = '⬇ PDF'; }
+            }
+        }
+    </script>
+</body>
+
+</html>
